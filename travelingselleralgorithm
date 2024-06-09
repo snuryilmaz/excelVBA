@@ -1,0 +1,99 @@
+Dim sehir_sayisi, satir 
+          'Start by opening Excel Vba, pressing “add” from the “developer” tab and adding a button from Activex controls. 
+          'We can name the button “Find short distance”. 
+          'You can change the name of the button by right clicking on the button and selecting “Caption” in the “properties” section. 
+Private Sub CommandButton1_Click()
+'with this line of code we will color the number of cities column of our table.
+Range("A1:XX100000").ClearContents
+Range("A1:XX10000").Select
+    With Selection.Interior
+        .Pattern = xlNone
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+sehir_sayisi = Int(InputBox("Şehir sayısını giriniz:"))
+matris_kur 'go new procedure
+baslangic_sehri = Int(InputBox("Hangi şehirden başlanacak?"))
+varilan_sehir = Int(InputBox("Hangi şehre varılacak?"))
+'here we paint columns with 1 more than the number of cities. this is one of the dynamic aspects of the work
+Range("A1:A" & (sehir_sayisi + 1)).Select
+    With Selection.Interior
+            .Pattern = xlSolid
+            .PatternColorIndex = xlAutomatic
+            .Color = 5287936
+            .TintAndShade = 0
+            .PatternTintAndShade = 0
+        End With
+Range("A1:" & Chr(64 + sehir_sayisi + 1) & "1").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+
+en_kucuk_sehir = baslangic_sehri
+Cells(sehir_sayisi + 3, 2) = baslangic_sehri
+Cells(2, sehir_sayisi + 3) = baslangic_sehri
+Cells(3, sehir_sayisi + 3) = varilan_sehir
+
+For satir = 1 To sehir_sayisi - 2
+    en_kucuk_mesafe = 10000
+For i = 1 To sehir_sayisi
+    sehirziyaretedildimi = 0
+    For j = 1 To sehir_sayisi + 1
+        If Cells(j + 1, sehir_sayisi + 3) = i Then
+            sehirziyaretedildimi = 1
+        End If
+    Next j
+    
+    If sehirziyaretedildimi <> 1 Then
+        If Cells(baslangic_sehri + 1, i + 1) < en_kucuk_mesafe Then
+            en_kucuk_mesafe = Cells(baslangic_sehri + 1, i + 1)
+            en_kucuk_sehir = i
+        End If
+    End If
+Next i
+    Cells(sehir_sayisi + 3, satir + 2) = en_kucuk_sehir
+    'This line stores the city visited along the route
+    Cells(sehir_sayisi + 4, satir + 2) = en_kucuk_mesafe
+    'This line stores the distance along the route
+    baslangic_sehri = en_kucuk_sehir
+    Cells(satir + 3, sehir_sayisi + 3) = en_kucuk_sehir
+Next satir
+
+
+Cells(sehir_sayisi + 3, satir + 2) = varilan_sehir
+'Determines the last city when the route is completed
+Cells(sehir_sayisi + 4, satir + 2) = Cells(en_kucuk_sehir + 1, varilan_sehir + 1)
+'This is the distance from the last city to the destination city.
+For i = 1 To sehir_sayisi - 1
+Cells(sehir_sayisi + 4, sehir_sayisi + 3) = Cells(sehir_sayisi + 4, sehir_sayisi + 3) + _
+        Cells(sehir_sayisi + 4, i + 2)
+Next i
+End Sub
+--------------------------------------------------------------------------------------------------------------------------
+Sub matris_kur() 
+For i = 1 To sehir_sayisi
+    Cells(1, i + 1) = i
+    Cells(i + 1, 1) = i
+Next i
+Cells(1, sehir_sayisi + 3) = "Gidilemeyecek şehir numarası"
+Cells(sehir_sayisi + 3, 1) = "Rota"
+Cells(sehir_sayisi + 4, 1) = "Mesafe"
+
+    For Row = 1 To sehir_sayisi - 1
+        For Column = 1 To sehir_sayisi
+            If Row <> Column Then
+                mesafe = Int(Rnd * 85 + 15)
+                Cells(1 + Row, Column + 1) = mesafe
+                Cells(Column + 1, 1 + Row) = mesafe
+            Else
+                Cells(Row + 1, Column + 1) = 0
+            End If
+        Next Column
+    Next Row
+End Sub
+-----------------------------------------------------------------------------------------------------------------------------
