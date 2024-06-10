@@ -1,0 +1,42 @@
+Option Explicit
+
+Private Sub CommandButton1_Click()
+    Dim ws As Worksheet
+    Dim kamyonKapasitesi(1 To 3) As Double
+    Dim toplamHacim(1 To 3) As Double
+    Dim siparis_isleme_sayisi As Integer
+    Dim siparisHacmi As Double
+    Dim i As Integer
+    Dim kamyonNo As Integer
+    
+    
+    For i = 1 To 3
+    kamyonKapasitesi(i) = Sheets("Kamyon Liste").Cells(i + 1, 2)
+    Next i
+    
+    ' Toplam Hacim başlatma
+    For i = 1 To 3
+        toplamHacim(i) = 0
+    Next i
+    
+    ' Kaç sipariş işlenecek
+    siparis_isleme_sayisi = Int(InputBox("Kaç siparişi işlemek istersiniz?(1:30)"))
+    
+    ' Siparişleri işleyin
+    For i = 2 To siparis_isleme_sayisi + 1
+        siparisHacmi = Sheets("SİPARİŞ LİSTESİ").Cells(i, 4) * Cells(i, 6)
+        ' Hacim = Sipariş Hacmi * Sipariş Adedi
+        
+        ' Ürünü kamyona yerleştirin
+        For kamyonNo = 1 To 3
+            If toplamHacim(kamyonNo) + siparisHacmi <= kamyonKapasitesi(kamyonNo) Then
+                toplamHacim(kamyonNo) = toplamHacim(kamyonNo) + siparisHacmi
+                Sheets("Sipariş Listesi").Cells(i, 7).Value = "Yüklendi"
+                Sheets("Sipariş Listesi").Cells(i, 8).Value = kamyonNo
+                Exit For
+            End If
+        Next kamyonNo
+    Next i
+    
+    MsgBox "Siparişler kamyonlara yüklendi!"
+End Sub
